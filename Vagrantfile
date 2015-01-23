@@ -9,6 +9,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
+  config.omnibus.chef_version = :latest
+
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
@@ -37,6 +39,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # inventory service
   config.vm.network "forwarded_port", guest: 3050, host: 3050
+
+  # rabbitmq
+  config.vm.network "forwarded_port", guest: 15672, host: 15672
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -68,71 +73,58 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Use VBoxManage to customize the VM. For example to change memory:
     vb.customize ["modifyvm", :id, "--memory", "2048"]
   end
-  
-  # View the documentation for the provider you're using for more
-  # information on available options.
-
-  # Enable provisioning with CFEngine. CFEngine Community packages are
-  # automatically installed. For example, configure the host as a
-  # policy server and optionally a policy file to run:
-  #
-  # config.vm.provision "cfengine" do |cf|
-  #   cf.am_policy_hub = true
-  #   # cf.run_file = "motd.cf"
-  # end
-  #
-  # You can also configure and bootstrap a client to an existing
-  # policy server:
-  #
-  # config.vm.provision "cfengine" do |cf|
-  #   cf.policy_server_address = "10.0.2.15"
-  # end
-
-  # Enable provisioning with Puppet stand alone.  Puppet manifests
-  # are contained in a directory path relative to this Vagrantfile.
-  # You will need to create the manifests directory and a manifest in
-  # the file default.pp in the manifests_path directory.
-  #
-  # config.vm.provision "puppet" do |puppet|
-  #   puppet.manifests_path = "manifests"
-  #   puppet.manifest_file  = "default.pp"
-  # end
 
   # Enable provisioning with chef solo, specifying a cookbooks path, roles
   # path, and data_bags path (all relative to this Vagrantfile), and adding
   # some recipes and/or roles.
   #
-  # config.vm.provision "chef_solo" do |chef|
-  #   chef.cookbooks_path = "../my-recipes/cookbooks"
-  #   chef.roles_path = "../my-recipes/roles"
-  #   chef.data_bags_path = "../my-recipes/data_bags"
-  #   chef.add_recipe "mysql"
-  #   chef.add_role "web"
-  #
-  #   # You may also specify custom JSON attributes:
-  #   chef.json = { mysql_password: "foo" }
-  # end
+  config.vm.provision "chef_solo" do |chef|
+    chef.add_recipe "apt"
+    chef.add_recipe "build-essential"
 
-  # Enable provisioning with chef server, specifying the chef server URL,
-  # and the path to the validation key (relative to this Vagrantfile).
-  #
-  # The Opscode Platform uses HTTPS. Substitute your organization for
-  # ORGNAME in the URL and validation key.
-  #
-  # If you have your own Chef Server, use the appropriate URL, which may be
-  # HTTP instead of HTTPS depending on your configuration. Also change the
-  # validation key to validation.pem.
-  #
-  # config.vm.provision "chef_client" do |chef|
-  #   chef.chef_server_url = "https://api.opscode.com/organizations/ORGNAME"
-  #   chef.validation_key_path = "ORGNAME-validator.pem"
-  # end
-  #
-  # If you're using the Opscode platform, your validator client is
-  # ORGNAME-validator, replacing ORGNAME with your organization name.
-  #
-  # If you have your own Chef Server, the default validation client name is
-  # chef-validator, unless you changed the configuration.
-  #
-  #   chef.validation_client_name = "ORGNAME-validator"
+    chef.add_recipe "ruby_build"
+    chef.add_recipe "rbenv::user"
+    chef.add_recipe "rbenv::vagrant"
+
+    chef.add_recipe "memcached"
+    chef.add_recipe "nginx"
+
+    chef.add_recipe "nodejs"
+    chef.add_recipe "nodejs::npm"
+
+    chef.add_recipe "mysql::server"
+    chef.add_recipe "mysql::client"
+
+    chef.add_recipe "rabbitmq::default"
+    chef.add_recipe "rabbitmq::mgmt_console"
+
+    chef.add_recipe "httpie"
+
+    chef.json = {
+      'mysql' => {
+        'server_root_password' => 'root',
+        'server_debian_password' => 'vagrant',
+        'server_repl_password' => 'root',
+        'allow_remote_root' => true,
+
+        'client' => {
+          'packages' => ['mysql-client', 'libmysqlclient-dev', 'ruby-mysql']
+        }
+      },
+
+      'rbenv' => {
+        'user_installs' => [
+          {
+            'user' => 'vagrant',
+            'rubies' => ['2.1.0'],
+            'global' => '2.1.0'
+          }
+        ]
+      },
+
+      'nodejs' => {
+        'npm' => '2.1.15'
+      }
+    }
+  end
 end
