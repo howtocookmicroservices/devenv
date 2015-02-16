@@ -8,11 +8,11 @@ If you're interested into how this VM was prepared, make sure to review original
 
 # Running
 
-$`git clone git@github.com:howtocookmicroservices/devenv.git`
-$`cd devenv`
-$`vagrant up` # to build VM using specified image
-$`vagrant provision` # to provision VM
-$`vagrant ssh` # to get inside VM
+    git clone git@github.com:howtocookmicroservices/devenv.git
+    cd devenv
+    vagrant up
+    vagrant provision
+    vagrant ssh
 
 ## About
 
