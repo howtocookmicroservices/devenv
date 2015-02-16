@@ -1,17 +1,28 @@
 # devenv
 
-Ruby/Rails development environment built with Vagrant and provisioned using Chef. Chef cookbooks are managed using Berkshelf. Fully suited for Ruby/Rails development.
+Ruby/Rails development environment built with Vagrant and provisioned using Chef. Chef cookbooks are managed using Berkshelf.
 
 Box is used for developing examples for [How To Cook Microservices](http://howtocookmicroservices.com/).
 
-If you're interested into how this VM was prepared, make sure to review original article [How To Cook Microservices - Development](http://howtocookmicroservices.com/development/)
+If you're interested into how this VM was prepared, check original article [How To Cook Microservices - Development](http://howtocookmicroservices.com/development/)
 
-# Running
+## Overview
+- 2GB of RAM allocated
+- Ruby 2.1.0 + rbenv
+- NodeJS 2.1.15
+- MySQL 5.6.1
+- RabbitMQ
+- nginx 1.1.19
+- memcached 1.4.13
+
+# Running VM
+
+Make sure to install `vagrant-berkshelf` plugin, so that it will automatically download and prepare Chef cookbooks at the time of bringing VM up
 
     git clone git@github.com:howtocookmicroservices/devenv.git
+    mkdir web # create 'web' directory where our apps will be located
     cd devenv
     vagrant up
-    vagrant provision
     vagrant ssh
 
 ## About
@@ -25,7 +36,7 @@ If you're interested into how this VM was prepared, make sure to review original
 
 - Chef Development Kit Version: 0.3.6
 - Berkshelf Version: 3.2.3
-- To review cookbooks installed in this VM, see **Berksfile**
+- To review full list of installed cookbooks see **Berksfile**
 
 ### Troubleshooting
 
