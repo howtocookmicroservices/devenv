@@ -8,3 +8,4 @@ cookbook "rabbitmq", '3.4.0'
 cookbook "ruby_build", "0.8.0"
 cookbook "rbenv", git: "git://github.com/fnichol/chef-rbenv.git", ref: "v0.7.2"
 cookbook "httpie", "0.1.0"
+cookbook "oh_my_zsh", git: "git@github.com:shingara/oh-my-zsh-chef.git"

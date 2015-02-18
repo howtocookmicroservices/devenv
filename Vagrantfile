@@ -99,6 +99,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "rabbitmq::mgmt_console"
 
     chef.add_recipe "httpie"
+    chef.add_recipe "oh_my_zsh"
 
     chef.json = {
       'mysql' => {
@@ -124,6 +125,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       'nodejs' => {
         'npm' => '2.1.15'
+      },
+
+      'oh_my_zsh' => {
+        'users' => [
+          {
+            login: 'vagrant',
+            theme: 'gentoo',
+            plugins: %w(gem git rails ruby)
+          }
+        ]
       }
     }
   end
